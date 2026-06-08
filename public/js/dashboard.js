@@ -136,4 +136,58 @@ function setupAvatarUpload() {
       const reader2 = new FileReader();
       reader2.onload = async (ev) => {
         const base64 = ev.target.result;
-        await _supabase.from('users').update({ avatar_
+        await _supabase.from('users').update({ avatar_url: base64 }).eq('id', currentUser.id);
+        currentProfile.avatar_url = base64;
+        showToast('프로필 사진이 저장되었습니다! 😊', 'success');
+      };
+      reader2.readAsDataURL(file);
+      return;
+    }
+
+    const { data } = _supabase.storage.from('avatars').getPublicUrl(path);
+    await _supabase.from('users').update({ avatar_url: data.publicUrl }).eq('id', currentUser.id);
+    currentProfile.avatar_url = data.publicUrl;
+    showToast('프로필 사진이 저장되었습니다! 😊', 'success');
+  });
+}
+
+// ── 히스토리 ────────────────────────────────────────────────────
+async function loadHistory() {
+  const { data, error } = await _supabase
+    .from('generation_history')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  const list = document.getElementById('historyList');
+  if (error || !data || data.length === 0) {
+    list.innerHTML = '<p class="empty-msg">아직 생성 기록이 없어요.</p>';
+    return;
+  }
+  list.innerHTML = data.map(item => `
+    <div class="history-item">
+      <span class="history-topic">${item.topic || '(주제 없음)'}</span>
+      <span class="history-meta">${formatDate(item.created_at)}</span>
+    </div>
+  `).join('');
+}
+
+// ── 구독 관리 ────────────────────────────────────────────────────
+async function handleManageSubscription() {
+  const btn = document.getElementById('manageSubBtn');
+  btn.disabled = true; btn.textContent = '처리 중...';
+  try {
+    const { data: { session } } = await _supabase.auth.getSession();
+    const res = await fetch('/.netlify/functions/customer-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body: JSON.stringify({ userId: currentUser.id })
+    });
+    const { url } = await res.json();
+    window.location.href = url;
+  } catch {
+    showToast('구독 관리 페이지를 열지 못했습니다.', 'error');
+    btn.disabled = false; btn.textContent = '구독 관리 (취소/변경)';
+  }
+}
