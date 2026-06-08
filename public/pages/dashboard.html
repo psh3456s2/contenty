@@ -26,9 +26,35 @@
   <main class="dashboard-main">
     <div class="dashboard-header">
       <h1>내 대시보드</h1>
-      <p id="dashUserEmail"></p>
     </div>
 
+    <!-- 프로필 카드 -->
+    <div class="profile-card">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar">👤</div>
+        <label class="avatar-edit-btn" for="avatarInput">📷</label>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none" />
+      </div>
+      <div class="profile-info">
+        <div class="profile-nickname-row">
+          <span class="profile-nickname" id="profileNickname">닉네임 없음</span>
+          <button class="profile-edit-btn" id="editNicknameBtn">✏️ 수정</button>
+        </div>
+        <span class="profile-email" id="profileEmail"></span>
+        <span class="profile-plan" id="profilePlanBadge"></span>
+      </div>
+    </div>
+
+    <!-- 닉네임 수정 폼 (숨김) -->
+    <div class="nickname-form hidden" id="nicknameForm">
+      <input type="text" id="nicknameInput" class="auth-input" placeholder="닉네임 입력 (최대 20자)" maxlength="20" />
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+        <button class="btn-primary" id="saveNicknameBtn">저장</button>
+        <button class="btn-secondary" id="cancelNicknameBtn">취소</button>
+      </div>
+    </div>
+
+    <!-- 통계 카드 -->
     <div class="dash-cards">
       <div class="dash-card">
         <div class="dash-card-label">현재 플랜</div>
@@ -64,7 +90,11 @@
   </main>
 
   <footer>
-    <p>© 2026 Contenty · <a href="/">홈으로</a></p>
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p>© 2026 Contenty · <a href="/">홈으로</a></p>
+      </div>
+    </div>
   </footer>
 
   <script src="/js/supabase-client.js"></script>
