@@ -4,15 +4,19 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
   let waited = 0;
-  while (!currentUser && waited < 1500) {
-    await new Promise(r => setTimeout(r, 100));
-    waited += 100;
+  while ((!currentUser || !currentProfile) && waited < 3000) {
+    await new Promise(r => setTimeout(r, 150));
+    waited += 150;
   }
   if (!currentUser) { window.location.href = '/'; return; }
-  loadDashboard();
+  if (currentProfile) loadDashboard();
 });
 
-function onAuthSignIn(user, profile) { loadDashboard(); }
+function onAuthSignIn(user, profile) {
+  currentUser = user;
+  currentProfile = profile;
+  loadDashboard();
+}
 
 async function loadDashboard() {
   if (!currentUser || !currentProfile) return;
