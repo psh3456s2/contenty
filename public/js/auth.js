@@ -5,22 +5,10 @@
 let currentUser = null;
 let currentProfile = null;
 
-// ── 초기화 ──────────────────────────────────────────────────────
 async function initAuth() {
-  const { data: { session } } = await _supabase.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    currentProfile = await fetchProfile(currentUser.id);
-  }
-
-  renderNav();
-  setupModalHandlers();
-
-  // 세션 변경 감지 (소셜 로그인 콜백 등)
   _supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session) {
       currentUser = session.user;
-      // 신규 유저 → DB 프로필 생성
       await ensureProfile(currentUser);
       currentProfile = await fetchProfile(currentUser.id);
       renderNav();
@@ -31,29 +19,32 @@ async function initAuth() {
       currentProfile = null;
       renderNav();
       if (typeof onAuthSignOut === 'function') onAuthSignOut();
+    } else if (event === 'TOKEN_REFRESHED' && session) {
+      currentUser = session.user;
+      if (!currentProfile) currentProfile = await fetchProfile(currentUser.id);
+      renderNav();
     }
   });
+
+  const { data: { session } } = await _supabase.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    await ensureProfile(currentUser);
+    currentProfile = await fetchProfile(currentUser.id);
+  }
+
+  renderNav();
+  setupModalHandlers();
 }
 
-// ── 프로필 조회 ─────────────────────────────────────────────────
 async function fetchProfile(userId) {
-  const { data, error } = await _supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single();
+  const { data, error } = await _supabase.from('users').select('*').eq('id', userId).single();
   if (error) return null;
   return data;
 }
 
-// ── 신규 유저 프로필 생성 ────────────────────────────────────────
 async function ensureProfile(user) {
-  const { data: existing } = await _supabase
-    .from('users')
-    .select('id')
-    .eq('id', user.id)
-    .single();
-
+  const { data: existing } = await _supabase.from('users').select('id').eq('id', user.id).single();
   if (!existing) {
     await _supabase.from('users').insert({
       id: user.id,
@@ -67,11 +58,9 @@ async function ensureProfile(user) {
   }
 }
 
-// ── 네비게이션 렌더 ─────────────────────────────────────────────
 function renderNav() {
   const nav = document.getElementById('navRight');
   if (!nav) return;
-
   if (currentUser && currentProfile) {
     const plan = currentProfile.plan || 'free';
     nav.innerHTML = `
@@ -86,25 +75,19 @@ function renderNav() {
   } else {
     nav.innerHTML = `
       <a href="/pages/pricing.html" class="btn-nav-ghost">요금제</a>
-      <button class="btn-nav-ghost" id="navLogin" onclick="openModal('login')">로그인</button>
+      <button class="btn-nav-ghost" onclick="openModal('login')">로그인</button>
       <button class="btn-nav-primary" onclick="openModal('signup')">무료 시작</button>
     `;
   }
 }
 
-// ── 모달 핸들러 ─────────────────────────────────────────────────
 function setupModalHandlers() {
   const overlay = document.getElementById('authModal');
   const closeBtn = document.getElementById('modalClose');
   if (!overlay) return;
-
   closeBtn?.addEventListener('click', closeModal);
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 }
 
 function openModal(mode = 'login') {
@@ -120,11 +103,9 @@ function closeModal() {
   modal.classList.add('hidden');
 }
 
-// ── 인증 폼 렌더 ────────────────────────────────────────────────
 function renderAuthContent(mode) {
   const content = document.getElementById('authContent');
   if (!content) return;
-
   if (mode === 'login') {
     content.innerHTML = `
       <h2 class="auth-title">로그인</h2>
@@ -161,32 +142,25 @@ function renderAuthContent(mode) {
       </div>
     `;
   }
-
-  // 이벤트 바인딩
   document.getElementById('authSubmitBtn').addEventListener('click', () => {
     mode === 'login' ? handleEmailLogin() : handleEmailSignup();
   });
   document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
-
-  // 엔터 키 제출
   ['authEmail', 'authPassword', 'authPasswordConfirm'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        mode === 'login' ? handleEmailLogin() : handleEmailSignup();
-      }
+      if (e.key === 'Enter') { mode === 'login' ? handleEmailLogin() : handleEmailSignup(); }
     });
   });
 }
 
-// ── 인증 함수들 ─────────────────────────────────────────────────
 function setAuthMsg(msg, type = 'error') {
   const el = document.getElementById('authMsg');
   if (!el) return;
   el.innerHTML = `<div class="auth-${type}">${msg}</div>`;
 }
 
-function setAuthLoading(loading) {
+function setAuthLoading(loading, mode) {
   const btn = document.getElementById('authSubmitBtn');
   if (!btn) return;
   if (loading) {
@@ -194,7 +168,7 @@ function setAuthLoading(loading) {
     btn.innerHTML = '<span class="spinner"></span>처리 중...';
   } else {
     btn.disabled = false;
-    btn.textContent = btn.closest('.auth-form')?.querySelector('[id="authPasswordConfirm"]') ? '회원가입' : '로그인';
+    btn.textContent = mode === 'login' ? '로그인' : '회원가입';
   }
 }
 
@@ -202,37 +176,33 @@ async function handleEmailLogin() {
   const email = document.getElementById('authEmail')?.value?.trim();
   const password = document.getElementById('authPassword')?.value;
   if (!email || !password) { setAuthMsg('이메일과 비밀번호를 입력해주세요.'); return; }
-
-  setAuthLoading(true);
+  setAuthLoading(true, 'login');
   const { error } = await _supabase.auth.signInWithPassword({ email, password });
-  setAuthLoading(false);
-
+  setAuthLoading(false, 'login');
   if (error) {
     if (error.message.includes('Invalid login credentials')) {
       setAuthMsg('이메일 또는 비밀번호가 올바르지 않습니다.');
+    } else if (error.message.includes('Email not confirmed')) {
+      setAuthMsg('이메일 인증이 필요합니다. 받은 메일함을 확인해주세요.');
     } else {
       setAuthMsg(error.message);
     }
   }
-  // 성공 시 onAuthStateChange가 처리
 }
 
 async function handleEmailSignup() {
   const email = document.getElementById('authEmail')?.value?.trim();
   const password = document.getElementById('authPassword')?.value;
   const confirm = document.getElementById('authPasswordConfirm')?.value;
-
   if (!email || !password) { setAuthMsg('이메일과 비밀번호를 입력해주세요.'); return; }
   if (password.length < 8) { setAuthMsg('비밀번호는 8자 이상이어야 합니다.'); return; }
   if (password !== confirm) { setAuthMsg('비밀번호가 일치하지 않습니다.'); return; }
-
-  setAuthLoading(true);
+  setAuthLoading(true, 'signup');
   const { error } = await _supabase.auth.signUp({
     email, password,
     options: { emailRedirectTo: window.location.origin }
   });
-  setAuthLoading(false);
-
+  setAuthLoading(false, 'signup');
   if (error) {
     setAuthMsg(error.message);
   } else {
@@ -254,5 +224,4 @@ async function handleLogout() {
   setTimeout(() => { window.location.href = '/'; }, 500);
 }
 
-// ── 자동 실행 ───────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initAuth);
