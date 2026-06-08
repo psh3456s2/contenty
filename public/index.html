@@ -3,46 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contenty — AI 마케팅 콘텐츠 생성기</title>
+  <title>Contenty — 마케터를 위한 콘텐츠 자동화</title>
   <link rel="stylesheet" href="/css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- NAV -->
   <nav class="navbar">
     <div class="nav-inner">
       <a class="nav-logo" href="/">✦ Contenty</a>
-      <div class="nav-right" id="navRight">
-        <!-- filled by JS -->
-      </div>
+      <div class="nav-right" id="navRight"></div>
     </div>
   </nav>
 
-  <!-- AUTH MODAL -->
   <div id="authModal" class="modal-overlay hidden">
     <div class="modal-box">
       <button class="modal-close" id="modalClose">✕</button>
-      <div id="authContent">
-        <!-- filled by auth.js -->
-      </div>
+      <div id="authContent"></div>
     </div>
   </div>
 
-  <!-- MAIN -->
   <main>
     <header class="hero">
-      <p class="hero-badge">AI 마케팅 콘텐츠 생성기</p>
+      <p class="hero-badge">마케터를 위한 콘텐츠 자동화</p>
       <h1>주제 하나로<br><span class="accent">5가지 채널 완성</span></h1>
       <p class="hero-sub">카드뉴스 · 블로그 · 카페 · 인스타 · 스레드<br>주제만 입력하면 채널별 콘텐츠를 한 번에 만들어드려요.</p>
     </header>
 
-    <!-- USAGE BANNER (로그인 유저에게만 표시) -->
     <div id="usageBanner" class="usage-banner hidden">
       <span id="usageText"></span>
       <a href="/pages/pricing.html" class="usage-upgrade">업그레이드 →</a>
     </div>
 
-    <!-- HOW TO USE -->
     <section class="how-to">
       <h2>📖 사용 방법</h2>
       <div class="steps">
@@ -52,7 +43,6 @@
       </div>
     </section>
 
-    <!-- API KEY SECTION -->
     <section class="api-section">
       <div class="api-group">
         <label>🔑 Claude API 키 <span class="label-sub">(텍스트 콘텐츠 생성)</span></label>
@@ -73,30 +63,40 @@
       </div>
     </section>
 
-    <!-- GENERATE SECTION -->
     <section class="generate-section">
       <div class="topic-group">
         <label>✏️ 주제 입력</label>
         <textarea id="topicInput" placeholder="예: 여름 신제품 선크림 출시 마케팅" rows="3"></textarea>
       </div>
-      <button class="btn-generate" id="generateBtn">✦ 생성하기</button>
-    </section>
-
-    <!-- RESULTS -->
-    <section class="results-section" id="resultsSection" style="display:none">
-      <div class="tabs">
-        <button class="tab active" data-tab="card">🗞 카드뉴스</button>
-        <button class="tab" data-tab="blog">✍️ 블로그</button>
+      <div class="tabs" style="margin-bottom:1rem">
+        <button class="tab" data-tab="card">🗞 카드뉴스</button>
+        <button class="tab active" data-tab="blog">✍️ 블로그</button>
         <button class="tab" data-tab="cafe">☕ 카페</button>
         <button class="tab" data-tab="insta">📸 인스타</button>
         <button class="tab" data-tab="thread">🧵 스레드</button>
       </div>
+      <button class="btn-generate" id="generateBtn">✦ 생성하기</button>
+    </section>
+
+    <section class="results-section" id="resultsSection" style="display:none">
       <div id="resultsContent" class="results-content"></div>
     </section>
   </main>
 
   <footer>
-    <p>© 2026 Contenty · Powered by Claude AI + DALL-E 3 · <a href="/pages/pricing.html">요금제</a></p>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <span class="footer-brand">✦ Contenty</span>
+        <div class="footer-links">
+          <a href="/pages/pricing.html">요금제</a>
+          <a href="mailto:ddukddak.company@gmail.com">문의하기</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>상호: 뚝딱 &nbsp;|&nbsp; 대표자: 박시현 &nbsp;|&nbsp; 사업자등록번호: 453-15-02695</p>
+        <p>© 2026 Contenty · Powered by Claude AI + DALL-E 3</p>
+      </div>
+    </div>
   </footer>
 
   <script src="/js/supabase-client.js"></script>
