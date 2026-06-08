@@ -1,0 +1,48 @@
+/* ===== DASHBOARD PAGE ===== */
+.dashboard-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+.dashboard-header {
+  padding: 2.5rem 0 2rem;
+}
+.dashboard-header h1 {
+  font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em;
+  margin-bottom: 0.25rem;
+}
+#dashUserEmail { color: var(--text2); font-size: 0.9rem; }
+
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.dash-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem 1.5rem;
+}
+.dash-card-label { font-size: 0.8rem; color: var(--text2); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.dash-card-value { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+
+.dash-actions {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.5rem;
+}
+
+.dash-section { margin-top: 1rem; }
+.dash-section h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.dash-hint { color: var(--text2); font-size: 0.875rem; margin-bottom: 1rem; }
+
+.history-list {
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.history-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 0.9rem 1.1rem;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.875rem; gap: 1rem; flex-wrap: wrap;
+}
+.history-topic { font-weight: 500; flex: 1; }
+.history-meta { color: var(--text2); font-size: 0.8rem; white-space: nowrap; }
+.empty-msg { color: var(--text2); font-size: 0.9rem; text-align: center; padding: 2rem; }

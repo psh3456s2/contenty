@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 — Contenty</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">✦ Contenty</a>
+      <div class="nav-right" id="navRight"></div>
+    </div>
+  </nav>
+
+  <div id="authModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div id="authContent"></div>
+    </div>
+  </div>
+
+  <main class="admin-main" id="adminMain" style="display:none">
+    <div class="admin-header">
+      <h1>🛠 관리자 대시보드</h1>
+      <p class="admin-sub">Contenty 운영 현황</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-label">전체 회원 수</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-label">유료 회원 수</div>
+        <div class="stat-value" id="statPaid">—</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-label">이번 달 예상 매출</div>
+        <div class="stat-value" id="statRevenue">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">오늘 생성 수</div>
+        <div class="stat-value" id="statGenerations">—</div>
+      </div>
+    </div>
+
+    <!-- PLAN BREAKDOWN -->
+    <div class="admin-section">
+      <h2>플랜별 분포</h2>
+      <div class="plan-breakdown" id="planBreakdown"></div>
+    </div>
+
+    <!-- USER TABLE -->
+    <div class="admin-section">
+      <div class="table-header">
+        <h2>회원 목록</h2>
+        <div class="table-controls">
+          <input type="text" id="searchInput" placeholder="이메일 검색..." class="search-input" />
+          <select id="planFilter" class="plan-filter-select">
+            <option value="">전체 플랜</option>
+            <option value="free">Free</option>
+            <option value="starter">Starter</option>
+            <option value="pro">Pro</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>이메일</th>
+              <th>플랜</th>
+              <th>오늘 사용량</th>
+              <th>총 생성 수</th>
+              <th>가입일</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr><td colspan="6" class="loading-row">불러오는 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-pagination" id="tablePagination"></div>
+    </div>
+  </main>
+
+  <div id="adminBlocked" style="display:none" class="blocked-msg">
+    <h2>접근 권한이 없습니다.</h2>
+    <p>관리자 계정으로 로그인해주세요.</p>
+    <a href="/" class="btn-primary">홈으로</a>
+  </div>
+
+  <footer>
+    <p>© 2026 Contenty</p>
+  </footer>
+
+  <script src="/js/supabase-client.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

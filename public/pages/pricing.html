@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>요금제 — Contenty</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/pricing.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">✦ Contenty</a>
+      <div class="nav-right" id="navRight"></div>
+    </div>
+  </nav>
+
+  <div id="authModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div id="authContent"></div>
+    </div>
+  </div>
+
+  <main class="pricing-main">
+    <div class="pricing-hero">
+      <h1>심플한 요금제</h1>
+      <p>필요에 맞는 플랜을 선택하세요. 언제든지 변경 가능해요.</p>
+    </div>
+
+    <div class="pricing-cards" id="pricingCards">
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="plan-badge free">Free</div>
+        <div class="plan-price"><span class="price-num">0</span><span class="price-unit">원</span></div>
+        <p class="plan-desc">시작하기에 딱 좋은 플랜</p>
+        <ul class="plan-features">
+          <li>✓ 하루 10회 생성</li>
+          <li>✓ 5가지 채널 모두 이용</li>
+          <li>✓ 카드뉴스 · 블로그 · 인스타 등</li>
+          <li class="disabled">✗ 무제한 생성</li>
+          <li class="disabled">✗ 우선 지원</li>
+        </ul>
+        <button class="plan-btn free-btn" id="freePlanBtn">무료로 시작하기</button>
+      </div>
+
+      <!-- Starter -->
+      <div class="pricing-card popular">
+        <div class="popular-badge">인기</div>
+        <div class="plan-badge starter">Starter</div>
+        <div class="plan-price"><span class="price-num">29,000</span><span class="price-unit">원/월</span></div>
+        <p class="plan-desc">적극적으로 활용하는 마케터를 위해</p>
+        <ul class="plan-features">
+          <li>✓ 하루 200회 생성</li>
+          <li>✓ 5가지 채널 모두 이용</li>
+          <li>✓ 카드뉴스 · 블로그 · 인스타 등</li>
+          <li>✓ 이메일 지원</li>
+          <li class="disabled">✗ 무제한 생성</li>
+        </ul>
+        <button class="plan-btn starter-btn" id="starterPlanBtn" data-plan="starter">Starter 시작하기</button>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card">
+        <div class="plan-badge pro">Pro</div>
+        <div class="plan-price"><span class="price-num">59,000</span><span class="price-unit">원/월</span></div>
+        <p class="plan-desc">제한 없이 마음껏 만드세요</p>
+        <ul class="plan-features">
+          <li>✓ <strong>무제한</strong> 생성</li>
+          <li>✓ 5가지 채널 모두 이용</li>
+          <li>✓ 카드뉴스 · 블로그 · 인스타 등</li>
+          <li>✓ 우선 이메일 지원</li>
+          <li>✓ 신기능 우선 체험</li>
+        </ul>
+        <button class="plan-btn pro-btn" id="proPlanBtn" data-plan="pro">Pro 시작하기</button>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2>자주 묻는 질문</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q">결제는 어떻게 이루어지나요?</div>
+          <div class="faq-a">Stripe를 통한 안전한 카드 결제가 이루어지며, 매월 자동으로 갱신됩니다.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">언제든지 취소할 수 있나요?</div>
+          <div class="faq-a">네, 언제든지 구독을 취소할 수 있습니다. 취소 후에는 현재 결제 기간이 끝날 때까지 사용 가능하며, 이후 Free 플랜으로 자동 전환됩니다.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">하루 생성 횟수는 언제 초기화되나요?</div>
+          <div class="faq-a">매일 자정(KST 기준)에 초기화됩니다.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">API 키는 직접 준비해야 하나요?</div>
+          <div class="faq-a">텍스트 콘텐츠용 Claude API 키와 카드뉴스 이미지용 OpenAI API 키는 각 서비스에서 직접 발급받으셔야 합니다. Contenty 요금제는 생성 횟수 제한을 관리합니다.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Contenty · <a href="/">홈으로</a></p>
+  </footer>
+
+  <script src="/js/supabase-client.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pricing.js"></script>
+</body>
+</html>

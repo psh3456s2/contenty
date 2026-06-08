@@ -1,0 +1,111 @@
+/* ===== PRICING PAGE ===== */
+.pricing-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+.pricing-hero {
+  text-align: center;
+  padding: 3rem 0 2.5rem;
+}
+.pricing-hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.75rem;
+}
+.pricing-hero p { color: var(--text2); font-size: 1rem; }
+
+.pricing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 4rem;
+}
+
+.pricing-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  position: relative;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.pricing-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.pricing-card.popular {
+  border-color: var(--accent);
+  box-shadow: 0 0 32px var(--accent-glow);
+}
+
+.popular-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--accent2); color: #fff;
+  font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.8rem;
+  border-radius: 99px; letter-spacing: 0.04em;
+}
+
+.plan-badge {
+  display: inline-block;
+  font-size: 0.8rem; font-weight: 700;
+  padding: 0.25rem 0.7rem; border-radius: 99px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.plan-badge.free { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.plan-badge.starter { background: rgba(251,191,36,0.12); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+.plan-badge.pro { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(167,139,250,0.3); }
+
+.plan-price {
+  margin-bottom: 0.5rem;
+  display: flex; align-items: baseline; gap: 0.25rem;
+}
+.price-num {
+  font-size: 2rem; font-weight: 800; letter-spacing: -0.04em;
+}
+.price-unit { font-size: 0.9rem; color: var(--text2); }
+.plan-desc { color: var(--text2); font-size: 0.875rem; margin-bottom: 1.5rem; }
+
+.plan-features {
+  list-style: none; display: flex; flex-direction: column; gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+.plan-features li { font-size: 0.9rem; color: var(--text); }
+.plan-features li.disabled { color: var(--text2); opacity: 0.5; }
+
+.plan-btn {
+  width: 100%; padding: 0.8rem;
+  border-radius: var(--radius-sm); border: none;
+  font-size: 0.9rem; font-weight: 700; cursor: pointer;
+  transition: all 0.2s; letter-spacing: -0.01em;
+}
+.free-btn {
+  background: var(--bg3); color: var(--text2);
+  border: 1px solid var(--border);
+}
+.free-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+.starter-btn {
+  background: var(--yellow); color: #1a1200;
+}
+.starter-btn:hover { filter: brightness(1.1); }
+.pro-btn {
+  background: var(--accent2); color: #fff;
+}
+.pro-btn:hover { background: var(--accent); }
+.plan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* current plan indicator */
+.plan-btn.current-plan {
+  background: var(--bg3) !important;
+  color: var(--green) !important;
+  border: 1px solid var(--green) !important;
+  cursor: default;
+}
+
+/* FAQ */
+.faq-section { max-width: 640px; margin: 0 auto; }
+.faq-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.25rem; text-align: center; }
+.faq-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.faq-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.1rem 1.25rem;
+}
+.faq-q { font-weight: 600; margin-bottom: 0.4rem; font-size: 0.95rem; }
+.faq-a { color: var(--text2); font-size: 0.875rem; line-height: 1.6; }
