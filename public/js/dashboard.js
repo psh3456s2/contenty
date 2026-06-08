@@ -59,6 +59,7 @@ async function loadDashboard() {
 // ── 닉네임 수정 ─────────────────────────────────────────────────
 function setupNicknameEdit() {
   const editBtn = document.getElementById('editNicknameBtn');
+  if (!editBtn) return;
   const form = document.getElementById('nicknameForm');
   const input = document.getElementById('nicknameInput');
   const saveBtn = document.getElementById('saveNicknameBtn');
@@ -67,9 +68,9 @@ function setupNicknameEdit() {
   // 현재 닉네임 입력창에 넣기
   input.value = currentProfile?.nickname || '';
 
-  editBtn.addEventListener('click', () => {
-    form.classList.remove('hidden');
-    input.focus();
+editBtn.addEventListener('click', () => {
+    form.classList.toggle('hidden');
+    if (!form.classList.contains('hidden')) input.focus();
   });
 
   cancelBtn.addEventListener('click', () => {
