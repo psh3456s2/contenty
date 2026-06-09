@@ -1,9 +1,9 @@
 // ================================================================
-// app.js — 메인 페이지 콘텐츠 생성 로직 (채널별 개별 생성)
+// app.js — 메인 페이지 콘텐츠 생성 로직 (여러 채널 동시 생성)
 // ================================================================
 
 const DAILY_LIMITS = { free: 10, starter: 200, pro: Infinity };
-const TABS = ['card', 'blog', 'cafe', 'insta', 'thread'];
+const CHANNEL_LABELS = { blog: '✍️ 블로그', cafe: '☕ 카페', insta: '📸 인스타', thread: '🧵 스레드' };
 let generatedResults = {};
 let currentChannel = 'blog';
 
@@ -32,42 +32,31 @@ function renderUsageBanner(profile) {
   }
 }
 
+// 채널 선택 탭 — 여러 개 동시 선택(토글) 가능
 function setupTabs() {
-  document.querySelectorAll('.tab').forEach(btn => {
+  document.querySelectorAll('.generate-section .tab').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      currentChannel = btn.dataset.tab;
-      renderTabContent(currentChannel);
+      btn.classList.toggle('active');
     });
   });
 }
 
-function renderTabContent(tab) {
-  const content = document.getElementById('resultsContent');
-  if (!content) return;
-  const result = generatedResults[tab];
-  if (!result) {
-    content.innerHTML = `<p style="color:var(--text2)">이 채널을 선택하고 생성하기 버튼을 눌러주세요.</p>`;
-    return;
-  }
-  if (tab === 'card' && Array.isArray(result)) {
-    content.innerHTML = result.map((card, i) => `
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;">
-        <div style="font-weight:700;margin-bottom:0.5rem;color:var(--accent)">카드 ${i+1}</div>
-        ${card.imageUrl ? `<img src="${card.imageUrl}" alt="카드 이미지" style="width:100%;max-width:400px;border-radius:var(--radius-sm);margin-bottom:0.75rem;display:block;" />` : ''}
-        <p>${card.text || ''}</p>
-      </div>
-    `).join('');
-  } else {
-    content.innerHTML = `<p style="white-space:pre-wrap">${result}</p>`;
-  }
+// 현재 선택된 채널 목록 가져오기
+function getSelectedChannels() {
+  return Array.from(document.querySelectorAll('.generate-section .tab.active'))
+    .map(btn => btn.dataset.tab);
 }
 
 async function handleGenerate() {
   const btn = document.getElementById('generateBtn');
   const topic = document.getElementById('topicInput').value.trim();
   if (!topic) { showToast('주제를 입력해주세요.', 'error'); return; }
+
+  const channels = getSelectedChannels();
+  if (channels.length === 0) {
+    showToast('채널을 하나 이상 선택해주세요.', 'error');
+    return;
+  }
 
   if (!currentUser) {
     showToast('로그인 후 이용해주세요.', 'info');
@@ -78,10 +67,9 @@ async function handleGenerate() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>생성 중...';
   document.getElementById('resultsSection').style.display = 'block';
-  document.getElementById('resultsContent').innerHTML = '<p style="color:var(--text2)">AI가 콘텐츠를 만들고 있어요... ✦</p>';
+  document.getElementById('resultsContent').innerHTML = `<p style="color:var(--text2)">AI가 ${channels.length}개 채널 콘텐츠를 만들고 있어요... ✦</p>`;
 
   try {
-    // 로그인 토큰 가져오기 (키 대신 토큰을 보냄)
     const { data: { session } } = await _supabase.auth.getSession();
     if (!session) {
       showToast('로그인이 만료되었어요. 다시 로그인해주세요.', 'error');
@@ -97,7 +85,7 @@ async function handleGenerate() {
       },
       body: JSON.stringify({
         topic,
-        channel: currentChannel,
+        channels, // 여러 채널을 배열로 보냄
       })
     });
 
@@ -107,15 +95,15 @@ async function handleGenerate() {
     }
 
     const data = await response.json();
-    const newResults = data.results || {};
-    generatedResults = { ...generatedResults, ...newResults };
+    generatedResults = data.results || {};
 
     if (currentUser) {
       currentProfile = await fetchProfile(currentUser.id);
       renderUsageBanner(currentProfile);
     }
 
-    renderTabContent(currentChannel);
+    // 결과 탭 만들기 (생성된 채널들만)
+    renderResultTabs(Object.keys(generatedResults));
     showToast('콘텐츠 생성 완료!', 'success');
 
   } catch (err) {
@@ -125,4 +113,38 @@ async function handleGenerate() {
     btn.disabled = false;
     btn.textContent = '✦ 생성하기';
   }
+}
+
+// 생성된 채널들로 결과 탭 구성
+function renderResultTabs(channels) {
+  const tabsEl = document.getElementById('resultTabs');
+  if (!tabsEl) return;
+  if (channels.length === 0) { tabsEl.innerHTML = ''; return; }
+
+  tabsEl.innerHTML = channels.map((ch, i) =>
+    `<button class="tab ${i === 0 ? 'active' : ''}" data-result-tab="${ch}">${CHANNEL_LABELS[ch] || ch}</button>`
+  ).join('');
+
+  tabsEl.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabsEl.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      currentChannel = btn.dataset.resultTab;
+      renderResultContent(currentChannel);
+    });
+  });
+
+  currentChannel = channels[0];
+  renderResultContent(currentChannel);
+}
+
+function renderResultContent(channel) {
+  const content = document.getElementById('resultsContent');
+  if (!content) return;
+  const result = generatedResults[channel];
+  if (!result) {
+    content.innerHTML = `<p style="color:var(--text2)">결과가 없어요.</p>`;
+    return;
+  }
+  content.innerHTML = `<p style="white-space:pre-wrap">${result}</p>`;
 }
