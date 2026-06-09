@@ -6,11 +6,44 @@
   <title>Contenty — 마케터를 위한 콘텐츠 자동화</title>
   <link rel="stylesheet" href="/css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* 반짝이는 별 */
+    @keyframes sparkle {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: scale(1.3) rotate(15deg); opacity: 0.7; }
+    }
+    .sparkle { display: inline-block; animation: sparkle 1.8s ease-in-out infinite; }
+    /* 통통 튀는 이모지 */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .bounce { display: inline-block; animation: bounce 1.4s ease-in-out infinite; }
+    /* 살짝 흔들리는 이모지 */
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
+    }
+    .wiggle { display: inline-block; animation: wiggle 1.2s ease-in-out infinite; }
+
+    /* 고충 공감 섹션 */
+    .pain-section { text-align: center; margin: 3rem auto; max-width: 900px; padding: 0 1.5rem; }
+    .pain-section h2 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+    .pain-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .pain-card {
+      background: var(--bg2, #1a1a1a); border: 1px solid var(--border, #333);
+      border-radius: 16px; padding: 1.5rem; transition: transform 0.2s ease;
+    }
+    .pain-card:hover { transform: translateY(-4px); }
+    .pain-card .emoji { font-size: 2rem; display: block; margin-bottom: 0.75rem; }
+    .pain-card .pain-title { font-weight: 700; margin-bottom: 0.5rem; }
+    .pain-card .pain-desc { color: var(--text2, #999); font-size: 0.92rem; line-height: 1.6; }
+  </style>
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-inner">
-      <a class="nav-logo" href="/">✦ Contenty</a>
+      <a class="nav-logo" href="/"><span class="sparkle">✦</span> Contenty</a>
       <div class="nav-right" id="navRight"></div>
     </div>
   </nav>
@@ -25,14 +58,35 @@
   <main>
     <header class="hero">
       <p class="hero-badge">마케터를 위한 콘텐츠 자동화</p>
-      <h1>주제 하나로<br><span class="accent">4가지 채널 완성</span></h1>
-      <p class="hero-sub">블로그 · 카페 · 인스타 · 스레드<br>주제만 입력하면 채널별 콘텐츠를 한 번에 만들어드려요.</p>
+      <h1>주제 하나만 입력하면<br><span class="accent">블로그·카페·인스타·스레드</span><br>콘텐츠가 한 번에 완성?! <span class="bounce">🚀</span></h1>
+      <p class="hero-sub">채널마다 다시 쓰느라 고생하지 마세요.<br>주제만 던지면 콘텐티가 4가지 채널 글을 한꺼번에 만들어드려요 <span class="wiggle">✨</span></p>
     </header>
 
     <div id="usageBanner" class="usage-banner hidden">
       <span id="usageText"></span>
       <a href="/pages/pricing.html" class="usage-upgrade">업그레이드 →</a>
     </div>
+
+    <section class="pain-section">
+      <h2>이런 고민, 있으셨죠? 🥲</h2>
+      <div class="pain-cards">
+        <div class="pain-card">
+          <span class="emoji">⏰</span>
+          <div class="pain-title">콘텐츠 만들 시간이 없어요</div>
+          <div class="pain-desc">본업만으로도 바쁜데, 채널 글까지 매번 쓰기엔 하루가 모자라요.</div>
+        </div>
+        <div class="pain-card">
+          <span class="emoji">🔁</span>
+          <div class="pain-title">채널마다 다시 쓰기 귀찮아요</div>
+          <div class="pain-desc">같은 내용을 블로그용, 인스타용으로 또 고쳐 쓰는 게 너무 번거로워요.</div>
+        </div>
+        <div class="pain-card">
+          <span class="emoji">💸</span>
+          <div class="pain-title">외주 맡기자니 비용이…</div>
+          <div class="pain-desc">콘텐츠 대행은 부담스럽고, 그렇다고 직접 하자니 막막했어요.</div>
+        </div>
+      </div>
+    </section>
 
     <section class="how-to">
       <h2>📖 사용 방법</h2>
