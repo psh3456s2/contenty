@@ -8,10 +8,6 @@ let generatedResults = {};
 let currentChannel = 'blog';
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadKeys();
-  setupKeyToggle('claudeKey', 'toggleClaude');
-  setupKeyToggle('openaiKey', 'toggleOpenAI');
-  setupKeyInputListeners();
   setupTabs();
   document.getElementById('generateBtn').addEventListener('click', handleGenerate);
 });
@@ -34,54 +30,6 @@ function renderUsageBanner(profile) {
     text.textContent = `오늘 남은 생성 횟수: ${remaining}/${limit}회`;
     if (remaining <= 2) banner.style.borderColor = 'rgba(248,113,113,0.5)';
   }
-}
-
-function loadKeys() {
-  const claudeKey = localStorage.getItem('contenty_claude_key');
-  const openaiKey = localStorage.getItem('contenty_openai_key');
-  if (claudeKey) {
-    document.getElementById('claudeKey').value = claudeKey;
-    const hint = document.getElementById('claudeHint');
-    hint.innerHTML = '✅ Claude API 키가 저장되어 있어요.';
-    hint.style.color = 'var(--green)';
-  }
-  if (openaiKey) {
-    document.getElementById('openaiKey').value = openaiKey;
-    const hint = document.getElementById('openaiHint');
-    hint.innerHTML = '✅ OpenAI API 키가 저장되어 있어요.';
-    hint.style.color = 'var(--green)';
-  }
-}
-
-function setupKeyInputListeners() {
-  document.getElementById('claudeKey').addEventListener('input', (e) => {
-    const val = e.target.value.trim();
-    if (val) {
-      localStorage.setItem('contenty_claude_key', val);
-      const hint = document.getElementById('claudeHint');
-      hint.textContent = '✅ 저장됨';
-      hint.style.color = 'var(--green)';
-    }
-  });
-  document.getElementById('openaiKey').addEventListener('input', (e) => {
-    const val = e.target.value.trim();
-    if (val) {
-      localStorage.setItem('contenty_openai_key', val);
-      const hint = document.getElementById('openaiHint');
-      hint.textContent = '✅ 저장됨';
-      hint.style.color = 'var(--green)';
-    }
-  });
-}
-
-function setupKeyToggle(inputId, btnId) {
-  const input = document.getElementById(inputId);
-  const btn = document.getElementById(btnId);
-  btn.addEventListener('click', () => {
-    const isHidden = input.type === 'password';
-    input.type = isHidden ? 'text' : 'password';
-    btn.textContent = isHidden ? '숨기기' : '보기';
-  });
 }
 
 function setupTabs() {
@@ -121,9 +69,6 @@ async function handleGenerate() {
   const topic = document.getElementById('topicInput').value.trim();
   if (!topic) { showToast('주제를 입력해주세요.', 'error'); return; }
 
-  const claudeKey = document.getElementById('claudeKey').value.trim();
-  if (!claudeKey) { showToast('Claude API 키를 먼저 입력해주세요.', 'error'); return; }
-
   if (!currentUser) {
     showToast('로그인 후 이용해주세요.', 'info');
     openModal('login');
@@ -136,15 +81,23 @@ async function handleGenerate() {
   document.getElementById('resultsContent').innerHTML = '<p style="color:var(--text2)">AI가 콘텐츠를 만들고 있어요... ✦</p>';
 
   try {
+    // 로그인 토큰 가져오기 (키 대신 토큰을 보냄)
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (!session) {
+      showToast('로그인이 만료되었어요. 다시 로그인해주세요.', 'error');
+      openModal('login');
+      return;
+    }
+
     const response = await fetch('/.netlify/functions/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
       body: JSON.stringify({
         topic,
-        claudeKey,
         channel: currentChannel,
-        openaiKey: document.getElementById('openaiKey').value.trim(),
-        userId: currentUser?.id,
       })
     });
 
