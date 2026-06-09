@@ -2,7 +2,7 @@
 // app.js — 메인 페이지 콘텐츠 생성 로직 (여러 채널 동시 생성)
 // ================================================================
 
-const DAILY_LIMITS = { free: 10, starter: 200, pro: Infinity };
+const DAILY_LIMITS = { free: 10, starter: 70, pro: 200 };
 const CHANNEL_LABELS = { blog: '✍️ 블로그', cafe: '☕ 카페', insta: '📸 인스타', thread: '🧵 스레드' };
 let generatedResults = {};
 let currentChannel = 'blog';
@@ -21,15 +21,11 @@ function renderUsageBanner(profile) {
   if (!banner || !profile) return;
   const plan = profile.plan || 'free';
   const usage = profile.daily_usage || 0;
-  const limit = DAILY_LIMITS[plan];
+  const limit = DAILY_LIMITS[plan] || DAILY_LIMITS.free;
+  const remaining = Math.max(0, limit - usage);
   banner.classList.remove('hidden');
-  if (plan === 'pro') {
-    text.textContent = `✦ Pro 플랜 — 오늘 ${usage}회 생성 (무제한)`;
-  } else {
-    const remaining = Math.max(0, limit - usage);
-    text.textContent = `오늘 남은 생성 횟수: ${remaining}/${limit}회`;
-    if (remaining <= 2) banner.style.borderColor = 'rgba(248,113,113,0.5)';
-  }
+  text.textContent = `오늘 남은 생성 횟수: ${remaining}/${limit}회`;
+  if (remaining <= 2) banner.style.borderColor = 'rgba(248,113,113,0.5)';
 }
 
 // 채널 선택 탭 — 여러 개 동시 선택(토글) 가능
@@ -141,7 +137,6 @@ function renderResultContent(channel) {
     content.innerHTML = `<p style="color:var(--text2)">결과가 없어요.</p>`;
     return;
   }
-  // 복사 버튼 + 본문
   content.innerHTML = `
     <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem;">
       <button id="copyBtn" class="btn-toggle" style="cursor:pointer;">📋 복사하기</button>
@@ -162,7 +157,6 @@ function renderResultContent(channel) {
   });
 }
 
-// HTML 특수문자 처리 (안전하게 표시)
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
