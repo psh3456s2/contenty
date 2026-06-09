@@ -41,7 +41,6 @@ function setupTabs() {
   });
 }
 
-// 현재 선택된 채널 목록 가져오기
 function getSelectedChannels() {
   return Array.from(document.querySelectorAll('.generate-section .tab.active'))
     .map(btn => btn.dataset.tab);
@@ -68,6 +67,7 @@ async function handleGenerate() {
   btn.innerHTML = '<span class="spinner"></span>생성 중...';
   document.getElementById('resultsSection').style.display = 'block';
   document.getElementById('resultsContent').innerHTML = `<p style="color:var(--text2)">AI가 ${channels.length}개 채널 콘텐츠를 만들고 있어요... ✦</p>`;
+  document.getElementById('resultTabs').innerHTML = '';
 
   try {
     const { data: { session } } = await _supabase.auth.getSession();
@@ -83,10 +83,7 @@ async function handleGenerate() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({
-        topic,
-        channels, // 여러 채널을 배열로 보냄
-      })
+      body: JSON.stringify({ topic, channels })
     });
 
     if (!response.ok) {
@@ -102,7 +99,6 @@ async function handleGenerate() {
       renderUsageBanner(currentProfile);
     }
 
-    // 결과 탭 만들기 (생성된 채널들만)
     renderResultTabs(Object.keys(generatedResults));
     showToast('콘텐츠 생성 완료!', 'success');
 
@@ -115,7 +111,6 @@ async function handleGenerate() {
   }
 }
 
-// 생성된 채널들로 결과 탭 구성
 function renderResultTabs(channels) {
   const tabsEl = document.getElementById('resultTabs');
   if (!tabsEl) return;
@@ -146,5 +141,30 @@ function renderResultContent(channel) {
     content.innerHTML = `<p style="color:var(--text2)">결과가 없어요.</p>`;
     return;
   }
-  content.innerHTML = `<p style="white-space:pre-wrap">${result}</p>`;
+  // 복사 버튼 + 본문
+  content.innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem;">
+      <button id="copyBtn" class="btn-toggle" style="cursor:pointer;">📋 복사하기</button>
+    </div>
+    <p style="white-space:pre-wrap">${escapeHtml(result)}</p>
+  `;
+
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(result);
+      copyBtn.textContent = '✅ 복사됨!';
+      showToast('클립보드에 복사되었어요!', 'success');
+      setTimeout(() => { copyBtn.textContent = '📋 복사하기'; }, 2000);
+    } catch {
+      showToast('복사에 실패했어요. 직접 선택해서 복사해주세요.', 'error');
+    }
+  });
+}
+
+// HTML 특수문자 처리 (안전하게 표시)
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
