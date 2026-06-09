@@ -3,7 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY; // 서버에서만 읽음
-const DAILY_LIMITS = { free: 10, starter: 200, pro: Infinity };
+const DAILY_LIMITS = { free: 10, starter: 70, pro: 200 };
 const VALID_CHANNELS = ['blog', 'cafe', 'insta', 'thread'];
 
 exports.handler = async (event) => {
