@@ -25,8 +25,8 @@
   <main>
     <header class="hero">
       <p class="hero-badge">마케터를 위한 콘텐츠 자동화</p>
-      <h1>주제 하나로<br><span class="accent">5가지 채널 완성</span></h1>
-      <p class="hero-sub">카드뉴스 · 블로그 · 카페 · 인스타 · 스레드<br>주제만 입력하면 채널별 콘텐츠를 한 번에 만들어드려요.</p>
+      <h1>주제 하나로<br><span class="accent">4가지 채널 완성</span></h1>
+      <p class="hero-sub">블로그 · 카페 · 인스타 · 스레드<br>주제만 입력하면 채널별 콘텐츠를 한 번에 만들어드려요.</p>
     </header>
 
     <div id="usageBanner" class="usage-banner hidden">
@@ -38,28 +38,8 @@
       <h2>📖 사용 방법</h2>
       <div class="steps">
         <div class="step"><div class="step-num">1</div><div><strong>회원가입 / 로그인</strong><br>이메일 또는 Google 계정으로 가입하세요.</div></div>
-        <div class="step"><div class="step-num">2</div><div><strong>API 키 입력 (선택)</strong><br>무료 플랜은 하루 10회 제공. 더 많이 쓰려면 <a href="/pages/pricing.html">요금제</a>를 확인하세요.</div></div>
-        <div class="step"><div class="step-num">3</div><div><strong>채널 선택 & 생성</strong><br>카드뉴스는 DALL-E 3로 배경 이미지를 자동 생성해 실제 디자인 카드로 만들어줘요.</div></div>
-      </div>
-    </section>
-
-    <section class="api-section">
-      <div class="api-group">
-        <label>🔑 Claude API 키 <span class="label-sub">(텍스트 콘텐츠 생성)</span></label>
-        <div class="input-row">
-          <input type="password" id="claudeKey" placeholder="sk-ant-..." autocomplete="off" />
-          <button class="btn-toggle" id="toggleClaude">보기</button>
-        </div>
-        <p class="api-hint" id="claudeHint">⚠ Claude API 키를 입력해주세요 — <a href="https://console.anthropic.com/settings/keys" target="_blank">발급</a></p>
-      </div>
-      <div class="api-group">
-        <label>🎨 OpenAI API 키 <span class="label-sub">(카드뉴스 이미지 생성 · DALL-E 3)</span></label>
-        <div class="input-row">
-          <input type="password" id="openaiKey" placeholder="sk-..." autocomplete="off" />
-          <button class="btn-toggle" id="toggleOpenAI">보기</button>
-        </div>
-        <p class="api-hint" id="openaiHint">⚠ OpenAI API 키를 입력해주세요 (카드뉴스 생성 시 필요) — <a href="https://platform.openai.com/api-keys" target="_blank">발급</a></p>
-        <p class="api-note">💡 DALL-E 3 이미지 1장 = 약 $0.04 (약 55원). 카드뉴스 5장 생성 시 약 275원이 OpenAI 계정에서 차감돼요.<br>카드뉴스 채널을 선택하지 않으면 OpenAI 키 없이도 사용 가능해요.</p>
+        <div class="step"><div class="step-num">2</div><div><strong>주제 입력</strong><br>만들고 싶은 콘텐츠의 주제를 입력하세요. 무료 플랜은 하루 10회 제공.</div></div>
+        <div class="step"><div class="step-num">3</div><div><strong>채널 선택 & 생성</strong><br>블로그·카페·인스타·스레드 중 원하는 채널을 골라 바로 생성하세요. 더 많이 쓰려면 <a href="/pages/pricing.html">요금제</a>를 확인하세요.</div></div>
       </div>
     </section>
 
@@ -69,7 +49,6 @@
         <textarea id="topicInput" placeholder="예: 여름 신제품 선크림 출시 마케팅" rows="3"></textarea>
       </div>
       <div class="tabs" style="margin-bottom:1rem">
-        <button class="tab" data-tab="card">🗞 카드뉴스</button>
         <button class="tab active" data-tab="blog">✍️ 블로그</button>
         <button class="tab" data-tab="cafe">☕ 카페</button>
         <button class="tab" data-tab="insta">📸 인스타</button>
@@ -88,13 +67,15 @@
       <div class="footer-top">
         <span class="footer-brand">✦ Contenty</span>
         <div class="footer-links">
-          <a href="/pages/pricing.html">요금제</a>
+          <a href="/pages/terms.html">이용약관</a>
+          <a href="/pages/privacy.html">개인정보처리방침</a>
           <a href="mailto:ddukddak.company@gmail.com">문의하기</a>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>상호: 뚝딱 &nbsp;|&nbsp; 대표자: 박시현 &nbsp;|&nbsp; 사업자등록번호: 453-15-02695</p>
-        <p>© 2026 Contenty · Powered by Claude AI + DALL-E 3</p>
+        <p>상호명: 뚝딱lab &nbsp;|&nbsp; 대표: 박시현 &nbsp;|&nbsp; 사업자등록번호: 453-15-02695</p>
+        <p>이메일: ddukddak.company@gmail.com &nbsp;|&nbsp; 전화: 010-3456-7174</p>
+        <p>© 2026 Contenty · ddukddak-lab. All rights reserved.</p>
       </div>
     </div>
   </footer>
