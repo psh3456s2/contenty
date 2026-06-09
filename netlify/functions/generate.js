@@ -2,8 +2,9 @@ const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY; // 서버에서만 읽음 — 절대 클라이언트에서 받지 않음
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY; // 서버에서만 읽음
 const DAILY_LIMITS = { free: 10, starter: 200, pro: Infinity };
+const VALID_CHANNELS = ['blog', 'cafe', 'insta', 'thread'];
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return cors204();
@@ -19,10 +20,15 @@ exports.handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body); } catch { return json(400, { error: '잘못된 요청입니다.' }); }
 
-  const { topic, channel } = body; // claudeKey, userId 더 이상 받지 않음
+  const { topic } = body;
   if (!topic) return json(400, { error: '주제를 입력해주세요.' });
 
-  // ── 2. 로그인 강제: 토큰 검증으로 진짜 사용자 확인 ─────────────
+  // 채널 목록 정리 (유효한 채널만, 중복 제거)
+  let channels = Array.isArray(body.channels) ? body.channels : (body.channel ? [body.channel] : []);
+  channels = [...new Set(channels)].filter(ch => VALID_CHANNELS.includes(ch));
+  if (channels.length === 0) return json(400, { error: '생성할 채널을 하나 이상 선택해주세요.' });
+
+  // ── 2. 로그인 강제: 토큰 검증 ─────────────────────────────────
   const authHeader = event.headers.authorization || event.headers.Authorization || '';
   const token = authHeader.replace(/^Bearer\s+/i, '').trim();
   if (!token) return json(401, { error: '로그인이 필요합니다.' });
@@ -32,9 +38,9 @@ exports.handler = async (event) => {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return json(401, { error: '로그인이 만료되었습니다. 다시 로그인해주세요.' });
 
-  const userId = user.id; // body가 아니라 검증된 토큰에서 가져옴 — 위조 불가
+  const userId = user.id;
 
-  // ── 3. 사용량 검사 (우회 불가) ────────────────────────────────
+  // ── 3. 사용량 검사 (채널 수만큼 필요) ─────────────────────────
   const { data: profile, error: profileError } = await supabase
     .from('users')
     .select('plan, daily_usage, usage_reset_at')
@@ -57,22 +63,29 @@ exports.handler = async (event) => {
     usage = 0;
   }
 
-  if (usage >= limit) {
-    return json(429, { error: `오늘 생성 횟수(${limit}회)를 모두 사용했습니다. 내일 다시 이용하거나 요금제를 업그레이드해주세요.` });
+  const needed = channels.length; // 선택한 채널 수만큼 차감
+  if (usage + needed > limit) {
+    const remaining = Math.max(0, limit - usage);
+    return json(429, { error: `오늘 남은 생성 횟수는 ${remaining}회인데 ${needed}개 채널을 선택하셨어요. 채널을 줄이거나 요금제를 업그레이드해주세요.` });
   }
 
-  // ── 4. 생성 ───────────────────────────────────────────────────
+  // ── 4. 생성 (채널별로 각각) ───────────────────────────────────
   try {
-    const targetChannel = channel || 'blog';
-    const text = await generateText(buildPrompt(targetChannel, topic));
+    const results = {};
+    for (const ch of channels) {
+      const text = await generateText(buildPrompt(ch, topic));
+      results[ch] = text;
+      await supabase.from('generation_history').insert({
+        user_id: userId, topic, created_at: new Date().toISOString(),
+      });
+    }
 
-    // 기록 + 사용량 증가
-    await supabase.from('generation_history').insert({
-      user_id: userId, topic, created_at: new Date().toISOString(),
-    });
-    await supabase.rpc('increment_usage', { p_user_id: userId });
+    // 사용량을 채널 수만큼 증가
+    for (let i = 0; i < needed; i++) {
+      await supabase.rpc('increment_usage', { p_user_id: userId });
+    }
 
-    return json(200, { results: { [targetChannel]: text } });
+    return json(200, { results });
 
   } catch (err) {
     console.error('Generate error:', err);
@@ -85,7 +98,7 @@ async function generateText(prompt) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY, // 서버 환경변수에서만 가져옴
+      'x-api-key': ANTHROPIC_API_KEY,
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
@@ -103,7 +116,6 @@ async function generateText(prompt) {
 }
 
 function buildPrompt(channel, topic) {
-  // 모든 채널에 공통으로 적용되는 작성 규칙
   const commonRules = `\n\n[작성 규칙 — 반드시 지킬 것]\n- 마크다운 기호를 절대 사용하지 마세요. ## (제목 기호), ** (굵게 기호), - (목록 기호) 등 어떤 마크다운 문법도 쓰지 마세요.\n- 강조하고 싶을 때는 기호 대신 이모지나 줄바꿈을 활용하세요.\n- 이모지를 반드시 풍부하게 넣어 친근한 느낌을 주세요.\n- 바로 복사해서 붙여넣을 수 있는 완성된 글 형태로 작성하세요.`;
 
   const prompts = {
