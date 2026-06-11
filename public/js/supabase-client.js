@@ -3,10 +3,8 @@
 // 환경변수는 Netlify Functions를 통해 서버에서 처리
 // 클라이언트에서는 PUBLIC 키만 사용
 // ================================================================
-
 const SUPABASE_URL = 'https://mvqzdyvoggvxyddhowhz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12cXpkeXZvZ2d2eHlkZGhvd2h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMzk4MzQsImV4cCI6MjA5NTYxNTgzNH0.yRZO1aPt1AG7b1i0MLb9KxU0T2iLgpxY3QAxfJmjMFU';
-
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: true,
@@ -14,6 +12,9 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, 
     detectSessionInUrl: true,
   }
 });
+
+// 포트원 결제 코드에서 사용 (전역 노출)
+window.supabaseClient = _supabase;
 
 // 전역 toast 유틸리티
 function showToast(message, type = 'info', duration = 3500) {
@@ -33,13 +34,11 @@ function showToast(message, type = 'info', duration = 3500) {
     setTimeout(() => toast.remove(), 300);
   }, duration);
 }
-
 // 날짜 포맷 유틸
 function formatDate(iso) {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
 }
-
 // 플랜 한글 표기
 function planLabel(plan) {
   const map = { free: 'Free', starter: 'Starter', pro: 'Pro' };
